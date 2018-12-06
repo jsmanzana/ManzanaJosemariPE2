@@ -7,11 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 class DBHelper extends SQLiteOpenHelper {
-
-    final static String DBName = "person.db";
+    final static String DBName = "student.db";
     final static int ver = 1;
     Cursor rs;
-    final static String table = "person";
+    final static String table = "grade";
 
     public DBHelper(Context context) {
         super(context, DBName, null, ver);
@@ -20,32 +19,48 @@ class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String cTable = "CREATE TABLE grade (ID INTEGER PRIMARY KEY AUTOINCREMENT, Fname TEXT, Age INTEGER, Gender TEXT)";
+        String cTable = "CREATE TABLE grade (ID INTEGER PRIMARY KEY AUTOINCREMENT, Fname TEXT, Lname TEXT, LGrade INTEGER)";
         db.execSQL(cTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String dTable = "DROP TABLE IF EXISTS person";
+        String dTable = "DROP TABLE IF EXISTS grade";
         db.execSQL(dTable);
         onCreate(db);
     }
 
-    public Cursor selectRecord(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT * FROM person", null);
-    }
-
-    public boolean insert(String fname, String gender, int age){
+    public boolean insert(String fname, String lname, int lgrade){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("Fname", fname);
-        cv.put("Age", age);
-        cv.put("Gender", gender);
+        cv.put("Lname", lname);
+        cv.put("LGrade", lgrade);
         long inserted = db.insert(table, null, cv);
         if (inserted == -1){
             return false;
         } else return true;
     }
 
+    public Cursor selectRecord(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.rawQuery("SELECT * FROM grade", null);
+    }
+
+
+    public boolean update(String id, String fname, String lname, int lgrade){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("Fname", fname);
+        cv.put("Lname", lname);
+        cv.put("LGrade", lgrade);
+        db.update(table,cv,"ID=?", new String[]{id});
+        return true;
+    }
+
+    public boolean delete(String id){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(table,"ID=?", new String[]{id});
+        return true;
+    }
 }
